@@ -9,22 +9,33 @@ export default function App() {
   function allNewDice() {
     const newDice = [];
     for (let i = 0; i < 10; i++) {
-      newDice.push({
-        value: Math.floor(Math.random() * (6 - 1 + 1) + 1),
-        isHeld: false,
-        id: nanoid(),
-      });
+      newDice.push(newDie());
     }
     return newDice;
   }
-
+  function newDie() {
+    return {
+      value: Math.floor(Math.random() * (6 - 1 + 1) + 1),
+      isHeld: false,
+      id: nanoid(),
+    };
+  }
   function rollDice() {
-    setDice(allNewDice());
+    setDice((oldDice) =>
+      oldDice.map((die) => {
+        return die.isHeld ? die : newDie();
+      })
+    );
   }
 
   function holdDice(id) {
-    console.log(id);
+    setDice((oldDice) =>
+      oldDice.map((die) => {
+        return die.id === id ? { ...die, isHeld: !die.isHeld } : die;
+      })
+    );
   }
+
   const diceElements = dice.map((die) => (
     <Die
       key={die.id}
