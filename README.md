@@ -1,6 +1,7 @@
 # Tenzies: A Dice-Rolling Game for Quick Thinkers
 
 In Tenzies, the objective is to roll the dice until all of them show the same value. Players aim to achieve 'tenzies' by strategically selecting which dice to hold and which to re-roll."
+Live preview: https://tenzies-anorte13.netlify.app/
 
 # Gameplay
 
