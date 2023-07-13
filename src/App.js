@@ -2,24 +2,39 @@ import "./styles.css";
 import React from "react";
 import Die from "./components/Die";
 import { nanoid } from "nanoid";
+import Confetti from "react-confetti";
 
 export default function App() {
-  const [dice, setDice] = React.useState(allNewDice);
+  const [dice, setDice] = React.useState(allNewDice());
   const [tenzies, setTenzies] = React.useState(false);
+  const [seconds, setSeconds] = React.useState(0);
+  const [turns, setTurns] = React.useState(0);
+  const [record, setRecord] = React.useState(0);
 
   React.useEffect(() => {
-    const allDiceHeld =
-      dice.filter(function (val) {
-        return val.isHeld === true;
-      }).length >= 10;
-    if (allDiceHeld) {
-      dice.every((val, i, arr) => val === arr[i]);
+    const allHeld = dice.every((die) => die.isHeld);
+    const firstValue = dice[0].value;
+    const allSameValue = dice.every((die) => die.value === firstValue);
+    if (allHeld && allSameValue) {
       setTenzies(true);
-      console.log("You won!");
-    } else {
-      console.log("Still havent won");
     }
   }, [dice]);
+
+  React.useEffect(() => {
+    let interval = null;
+
+    if (tenzies === false) {
+      interval = setInterval(() => {
+        setSeconds((time) => time + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+      setSeconds(interval);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [tenzies]);
 
   function allNewDice() {
     const newDice = [];
@@ -36,13 +51,20 @@ export default function App() {
     };
   }
   function rollDice() {
-    setDice((oldDice) =>
-      oldDice.map((die) => {
-        return die.isHeld ? die : newDie();
-      })
-    );
+    if (!tenzies) {
+      setDice((oldDice) =>
+        oldDice.map((die) => {
+          return die.isHeld ? die : newDie();
+        })
+      );
+      setTurns((prevTurn) => prevTurn + 1);
+    } else {
+      setTenzies(false);
+      setDice(allNewDice());
+      setSeconds(0);
+      setTurns(0);
+    }
   }
-
   function holdDice(id) {
     setDice((oldDice) =>
       oldDice.map((die) => {
@@ -59,8 +81,10 @@ export default function App() {
       holdDice={() => holdDice(die.id)}
     />
   ));
+
   return (
     <main>
+      {tenzies && <Confetti />}
       <h1 className="title">Tenzies</h1>
       <p className="instructions">
         Roll until all dice are the same. Click each die to freeze it at its
@@ -68,8 +92,13 @@ export default function App() {
       </p>
       <div className="die-container">{diceElements}</div>
       <button className="roll-button" onClick={rollDice}>
-        Roll
+        {tenzies ? "New Game" : "Roll"}
       </button>
+      <div className="game-stats">
+        <p>Time: {seconds}</p>
+        <p>Turn: {turns}</p>
+        <p>Fastest Time: {record}</p>
+      </div>
     </main>
   );
 }
