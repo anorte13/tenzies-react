@@ -9,7 +9,9 @@ export default function App() {
   const [tenzies, setTenzies] = React.useState(false);
   const [seconds, setSeconds] = React.useState(0);
   const [turns, setTurns] = React.useState(0);
-  const [record, setRecord] = React.useState(0);
+  const [record, setRecord] = React.useState(
+    parseInt(localStorage.getItem("record"))
+  );
 
   React.useEffect(() => {
     const allHeld = dice.every((die) => die.isHeld);
@@ -17,6 +19,10 @@ export default function App() {
     const allSameValue = dice.every((die) => die.value === firstValue);
     if (allHeld && allSameValue) {
       setTenzies(true);
+      if (seconds < record || record === Infinity) {
+        setRecord(seconds);
+        localStorage.setItem("record", seconds);
+      }
     }
   }, [dice]);
 
@@ -29,7 +35,6 @@ export default function App() {
       }, 1000);
     } else {
       clearInterval(interval);
-      setSeconds(interval);
     }
     return () => {
       clearInterval(interval);
@@ -61,8 +66,8 @@ export default function App() {
     } else {
       setTenzies(false);
       setDice(allNewDice());
-      setSeconds(0);
       setTurns(0);
+      setSeconds(0);
     }
   }
   function holdDice(id) {
