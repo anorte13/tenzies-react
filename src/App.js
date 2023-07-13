@@ -10,7 +10,7 @@ export default function App() {
   const [seconds, setSeconds] = React.useState(0);
   const [turns, setTurns] = React.useState(0);
   const [record, setRecord] = React.useState(
-    parseInt(localStorage.getItem("record"))
+    parseInt(localStorage.getItem("record")) || 0
   );
 
   React.useEffect(() => {
@@ -19,7 +19,10 @@ export default function App() {
     const allSameValue = dice.every((die) => die.value === firstValue);
     if (allHeld && allSameValue) {
       setTenzies(true);
-      if (seconds < record || record === Infinity) {
+      if (record === 0) {
+        setRecord(seconds);
+        localStorage.setItem("record", seconds);
+      } else if (seconds < record || record === Infinity) {
         setRecord(seconds);
         localStorage.setItem("record", seconds);
       }
